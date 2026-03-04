@@ -2,7 +2,7 @@
 
 ## 👨‍💻 Sobre mim
 
-Olá! Me chamo Brenno, sou estudante de Análise e Desenvolvimento de Sistemas e estou participando do Bootcamp da :contentReference[oaicite:0]{index=0} com foco em evolução técnica, boas práticas e preparação para atuar como Analista Júnior.
+Olá! Me chamo Brenno, sou estudante de Análise e Desenvolvimento de Sistemas e estou participando do Bootcamp da Delloite com foco em evolução técnica, boas práticas e preparação para atuar como Analista Júnior.
 
 Este repositório foi criado com o objetivo de documentar minha evolução durante o programa, registrando aprendizados, desafios, projetos e reflexões ao longo da jornada.
 
