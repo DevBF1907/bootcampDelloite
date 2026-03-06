@@ -1,123 +1,91 @@
-
-
-import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
-        ArrayList<Usuario> usuarios = new ArrayList<>();
-        int op = 0;
-        boolean exec = true;
+        UsuarioService service = new UsuarioService();
+        int op = -1;
 
-        while (exec) {
+        do {
+            Menu.mostrarMenu();
+            try {
+                op = sc.nextInt();
+                sc.nextLine();
+                switch (op) {
 
-            System.out.println("\n=====================================");
-            System.out.println("      SISTEMA DE USUÁRIOS - CRUD     ");
-            System.out.println("=====================================");
-            System.out.println("1 - Criar usuário");
-            System.out.println("2 - Listar usuários");
-            System.out.println("3 - Atualizar usuário");
-            System.out.println("4 - Remover usuário");
-            System.out.println("5 - Sair");
-            System.out.print("Escolha uma opção: ");
-            op = sc.nextInt();
-            sc.nextLine();
+                    case 1:
+                        System.out.println("\n--- CADASTRAR USUÁRIO ---");
+                        System.out.print("Nome: ");
+                        String nome = sc.nextLine();
 
-            switch (op) {
+                        System.out.print("Email: ");
+                        String email = sc.nextLine();
 
-                case 1:
-                    System.out.println("\n--- CRIAR USUÁRIO ---");
-                    System.out.print("Digite o nome: ");
-                    String nome = sc.nextLine();
-                    System.out.print("Digite o email: ");
-                    String email = sc.nextLine();
-                    System.out.print("Digite a senha: ");
-                    String senha = sc.nextLine();
+                        System.out.print("Senha: ");
+                        String senha = sc.nextLine();
 
+                        service.criarUsuario(nome, email, senha);
+                        System.out.println("Usuário cadastrado com sucesso!");
+                        break;
 
-                    boolean emailExistente = false;
-                    for (Usuario u : usuarios) {
-                        if (u.getEmail().equals(email)) {
-                            emailExistente = true;
-                            break;
-                        }
-                    }
+                    case 2:
+                        System.out.println("\n--- LISTA DE USUÁRIOS ---");
+                        service.listarUsuarios();
+                        break;
 
-                    if (emailExistente) {
-                        System.out.println("Erro: Email já cadastrado!");
-                    } else {
-                        usuarios.add(new Usuario(nome, email, senha));
-                        System.out.println("Usuário criado com sucesso!");
-                    }
-                    break;
+                    case 3:
+                        System.out.println("\n--- BUSCAR USUÁRIO POR ID ---");
+                        System.out.print("Digite o ID do usuário: ");
+                        int idBuscar = sc.nextInt();
 
-                case 2:
-                    System.out.println("\n--- LISTA DE USUÁRIOS ---");
-                    if (usuarios.isEmpty()) {
-                        System.out.println("Nenhum usuário cadastrado.");
-                    } else {
-                        for (Usuario u : usuarios) {
-                            System.out.println("Nome: " + u.getNome() + " | Email: " + u.getEmail());
-                        }
-                    }
-                    break;
+                        Usuario usuario = service.buscarUsuarioPorId(idBuscar);
+                        usuario.exibirUsuario();
+                        break;
 
-                case 3:
-                    System.out.println("\n--- ATUALIZAR USUÁRIO ---");
-                    System.out.print("Digite o email do usuário que deseja atualizar: ");
-                    String emailAtualizar = sc.nextLine();
-                    boolean encontrado = false;
+                    case 4:
+                        System.out.println("\n--- ATUALIZAR USUÁRIO ---");
+                        System.out.print("Digite o ID do usuário: ");
+                        int idAtualizar = sc.nextInt();
+                        sc.nextLine();
 
-                    for (Usuario u : usuarios) {
-                        if (u.getEmail().equals(emailAtualizar)) {
-                            encontrado = true;
-                            System.out.print("Novo nome: ");
-                            String novoNome = sc.nextLine();
-                            System.out.print("Nova senha: ");
-                            String novaSenha = sc.nextLine();
+                        System.out.print("Novo nome: ");
+                        String novoNome = sc.nextLine();
 
-                            u.setNome(novoNome);
-                            u.setSenha(novaSenha);
+                        service.atualizarUsuario(idAtualizar, novoNome);
+                        System.out.println("Usuário atualizado com sucesso!");
+                        break;
 
-                            System.out.println("Usuário atualizado com sucesso!");
-                            break;
-                        }
-                    }
+                    case 5:
+                        System.out.println("\n--- DELETAR USUÁRIO ---");
+                        System.out.print("Digite o ID do usuário: ");
+                        int idDeletar = sc.nextInt();
 
-                    if (!encontrado) {
-                        System.out.println("Usuário não encontrado!");
-                    }
-                    break;
+                        service.deletarUsuario(idDeletar);
+                        System.out.println("Usuário removido com sucesso!");
+                        break;
 
-                case 4:
-                    System.out.println("\n--- REMOVER USUÁRIO ---");
-                    System.out.print("Digite o email do usuário que deseja remover: ");
-                    String emailRemover = sc.nextLine();
-                    boolean removido = false;
+                    case 0:
+                        System.out.println("\nEncerrando sistema...");
+                        break;
 
-                    for (int i = 0; i < usuarios.size(); i++) {
-                        if (usuarios.get(i).getEmail().equals(emailRemover)) {
-                            usuarios.remove(i);
-                            System.out.println("Usuário removido com sucesso!");
-                            removido = true;
-                            break;
-                        }
-                    }
-                    if (!removido) {
-                        System.out.println("Usuário não encontrado!");
-                    }
-                    break;
-
-                case 5:
-                    System.out.println("Saindo do sistema... Até mais!");
-                    exec =  false;
-                    break;
-
-                default:
-                    System.out.println("Opção inválida! Digite um número entre 1 e 5.");
+                    default:
+                        System.out.println("\nOpção inválida.");
+                }
             }
-        }
+            catch (InputMismatchException e) {
+                System.out.println("\nErro: digite apenas números.");
+                sc.nextLine();
+            }
+            catch (UsuarioException e) {
+                System.out.println("\nErro: " + e.getMessage());
+            }
+            catch (Exception e) {
+                System.out.println("\nErro inesperado: " + e.getMessage());
+            }
+        } while (op != 0);
+        sc.close();
     }
 }
