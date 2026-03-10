@@ -27,6 +27,14 @@ Durante o bootcamp, estou trabalhando com:
 * Boas práticas de código
 * Metodologias Ágeis (Scrum)
 * Programação Orientada a Objetos (POO)
+* Java com Spring Boot
+* API REST
+* JPA e Hibernate
+* Banco de dados com H2
+* Lombok
+* DTO (Data Transfer Object)
+* Tratamento de exceções com Spring
+* Documentação de API com Swagger
 
 *(Esta seção será atualizada conforme avanço no programa.)*
 
@@ -67,6 +75,136 @@ Durante o desenvolvimento realizei as seguintes melhorias:
 * Organização do fluxo da aplicação através de um **menu interativo no `Main`**
 
 Este desafio foi importante para consolidar conceitos de **POO, organização de código e aplicação de regras de negócio**, aproximando o desenvolvimento de práticas utilizadas em projetos reais.
+
+---
+
+## 📌 Desafio 3 — Migração para Spring Boot e API REST
+
+Neste desafio o objetivo foi **migrar o projeto do Desafio 2** — que rodava no terminal — para uma **API REST** utilizando **Spring Boot**, aplicando conceitos e práticas utilizados no mercado de trabalho.
+
+### O que foi feito
+
+* Migração completa do projeto legado Java para **Spring Boot**
+* Substituição do `Scanner` e menu no terminal por **endpoints REST**
+* Criação de uma **API REST** com as operações de CRUD de usuários
+* Aplicação do padrão de arquitetura em camadas (**Controller → Service → Repository**)
+* Mapeamento da entidade `Usuario` com **JPA e Hibernate**
+* Substituição do `ArrayList` por um **banco de dados H2** em memória
+* Implementação do padrão **DTO** com `record` do Java para entrada e saída de dados
+* Uso do **Lombok** para reduzir código boilerplate na entidade
+* Tratamento global de exceções com **`@RestControllerAdvice`**
+* Documentação da API com **Swagger (SpringDoc OpenAPI)**
+
+### Estrutura do projeto
+
+```
+src/main/java/com/bootcampdelloite/desafiospringboot/
+├── Controller/
+│   └── UsuarioController.java     ← endpoints REST
+├── Service/
+│   └── UsuarioService.java        ← regras de negócio
+├── Repository/
+│   └── UsuarioRepository.java     ← acesso ao banco
+├── Model/
+│   └── Usuario.java               ← entidade JPA
+├── Dto/
+│   ├── UsuarioRequestDTO.java     ← dados de entrada
+│   └── UsuarioResponseDTO.java    ← dados de saída (sem senha)
+└── Exception/
+    ├── UsuarioException.java      ← exceção customizada
+    └── GlobalExceptionHandler.java ← tratamento global de erros
+```
+
+### Como rodar o projeto
+
+**Pré-requisitos:**
+- Java 17+
+- Maven
+
+**Passos:**
+
+```bash
+# 1. Clone o repositório
+git clone https://github.com/seu-usuario/bootcampDelloite.git
+
+# 2. Entre na pasta do desafio
+cd desafio3
+
+# 3. Rode o projeto
+./mvnw spring-boot:run
+```
+
+A aplicação estará disponível em `http://localhost:8080`
+
+---
+
+### 📋 Endpoints disponíveis
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/usuarios` | Cadastrar novo usuário |
+| `GET` | `/usuarios` | Listar todos os usuários |
+| `GET` | `/usuarios/{id}` | Buscar usuário por ID |
+| `PUT` | `/usuarios/{id}` | Atualizar nome do usuário |
+| `DELETE` | `/usuarios/{id}` | Deletar usuário |
+
+### Exemplos de requisição
+
+**Cadastrar usuário**
+```http
+POST http://localhost:8080/usuarios
+Content-Type: application/json
+
+{
+    "nome": "Brenno Felipe",
+    "email": "brenno@gmail.com",
+    "senha": "123456"
+}
+```
+
+**Resposta:**
+```json
+{
+    "id": 1,
+    "nome": "Brenno Felipe",
+    "email": "brenno@gmail.com"
+}
+```
+
+**Atualizar usuário**
+```http
+PUT http://localhost:8080/usuarios/1
+Content-Type: application/json
+
+{
+    "nome": "Brenno Atualizado",
+    "email": "brenno@gmail.com",
+    "senha": "123456"
+}
+```
+
+**Deletar usuário**
+```http
+DELETE http://localhost:8080/usuarios/1
+```
+
+---
+
+### 🛠️ Ferramentas disponíveis
+
+**Swagger UI** — interface visual para testar os endpoints:
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+**H2 Console** — visualizar o banco de dados em memória:
+```
+http://localhost:8080/h2-console
+
+JDBC URL:  jdbc:h2:mem:desafio1
+Username:  sa
+Password:  (deixar em branco)
+```
 
 ---
 
