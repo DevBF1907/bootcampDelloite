@@ -1,5 +1,3 @@
-
-
 public class Usuario {
     static int cont = 1;
 
