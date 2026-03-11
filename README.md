@@ -35,6 +35,8 @@ Durante o bootcamp, estou trabalhando com:
 * DTO (Data Transfer Object)
 * Tratamento de exceções com Spring
 * Documentação de API com Swagger
+* Testes Unitários com JUnit 5
+* Mocks com Mockito
 
 *(Esta seção será atualizada conforme avanço no programa.)*
 
@@ -205,6 +207,81 @@ JDBC URL:  jdbc:h2:mem:desafio1
 Username:  sa
 Password:  (deixar em branco)
 ```
+
+---
+
+## 📌 Desafio 4 — Testes Unitários com JUnit 5 e Mockito
+
+Neste desafio o objetivo foi **implementar testes unitários** na camada de Service do projeto Spring Boot, garantindo que todas as regras de negócio funcionem corretamente e de forma isolada.
+
+### O que foi feito
+
+* Implementação de **14 testes unitários** cobrindo todos os métodos do `UsuarioService`
+* Uso do **JUnit 5** como framework de testes
+* Uso do **Mockito** para simular o `UsuarioRepository` sem depender de banco de dados
+* Aplicação do padrão **Arrange / Act / Assert** para organizar os testes
+* Verificação das **mensagens de exceção** com `assertEquals`
+* Uso do `verify()` para garantir que métodos do repository foram ou não chamados
+* Cobertura de **cenários de sucesso e de erro** para cada operação do CRUD
+
+### Estrutura dos testes
+
+```
+src/test/java/com/bootcampdelloite/desafiospringboot/
+└── Service/
+    └── UsuarioServiceTest.java
+```
+
+### Casos de teste implementados
+
+| Método | Cenário | Resultado esperado |
+|---|---|---|
+| `criarUsuario` | dados válidos | usuário criado com sucesso |
+| `criarUsuario` | nome vazio | lança `UsuarioException` |
+| `criarUsuario` | nome nulo | lança `UsuarioException` |
+| `criarUsuario` | nome duplicado | lança `UsuarioException` |
+| `criarUsuario` | email vazio | lança `UsuarioException` |
+| `criarUsuario` | email inválido | lança `UsuarioException` |
+| `criarUsuario` | email duplicado | lança `UsuarioException` |
+| `listarUsuarios` | lista com usuários | retorna lista com sucesso |
+| `listarUsuarios` | lista vazia | lança `UsuarioException` |
+| `buscarUsuarioPorId` | ID existente | retorna usuário |
+| `buscarUsuarioPorId` | ID inexistente | lança `UsuarioException` |
+| `atualizarUsuario` | dados válidos | atualiza com sucesso |
+| `atualizarUsuario` | nome vazio | lança `UsuarioException` |
+| `deletarUsuario` | ID existente | deleta com sucesso |
+| `deletarUsuario` | ID inexistente | lança `UsuarioException` |
+
+### Conceitos aplicados
+
+* `@ExtendWith(MockitoExtension.class)` — habilita o Mockito sem subir o Spring
+* `@Mock` — simula o repository, **sem bater no banco**
+* `@InjectMocks` — injeta os mocks no service automaticamente
+* `@DisplayName` — descreve cada teste com linguagem natural
+* `when(...).thenReturn(...)` — define o comportamento do mock
+* `assertThrows(...)` — verifica se a exceção correta foi lançada
+* `assertEquals(...)` — verifica valores retornados
+* `verify(...)` — confirma se métodos foram ou não chamados
+
+### Branch
+
+O código deste desafio está localizado na branch:
+
+```
+feature/testesUnitarios
+```
+
+### Como rodar os testes
+
+```bash
+# 1. Acesse a branch
+git checkout feature/testesUnitarios
+
+# 2. Rode os testes
+./mvnw test
+```
+
+Ou no IntelliJ: clique com o botão direito na pasta `test` → **Run All Tests**
 
 ---
 
