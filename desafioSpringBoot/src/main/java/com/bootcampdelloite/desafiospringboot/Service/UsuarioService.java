@@ -5,39 +5,28 @@ import com.bootcampdelloite.desafiospringboot.Dto.UsuarioResponseDTO;
 import com.bootcampdelloite.desafiospringboot.Exception.UsuarioException;
 import com.bootcampdelloite.desafiospringboot.Model.Usuario;
 import com.bootcampdelloite.desafiospringboot.Repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bootcampdelloite.desafiospringboot.Validation.UsuarioValidation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository repository;
+    private final UsuarioRepository repository;
+    private final List<UsuarioValidation> validations;
 
     public UsuarioResponseDTO criarUsuario(UsuarioRequestDTO dto) {
-        if (dto.nome() == null || dto.nome().isBlank()) {
-            throw new UsuarioException("Nome não pode ser vazio.");
-        }
-        if (repository.existsByNomeIgnoreCase(dto.nome())) {
-            throw new UsuarioException("Já existe um usuário com esse nome.");
-        }
-        if (dto.email() == null || dto.email().isBlank()) {
-            throw new UsuarioException("Email não pode ser vazio.");
-        }
-        if (!dto.email().contains("@gmail.com")) {
-            throw new UsuarioException("Email inválido. Deve conter '@gmail.com'.");
-        }
-        if (repository.existsByEmailIgnoreCase(dto.email())) {
-            throw new UsuarioException("Esse email já está cadastrado.");
-        }
+        validations.forEach(v -> v.validar(dto));
 
         Usuario usuario = Usuario.builder()
                 .nome(dto.nome())
                 .email(dto.email())
                 .senha(dto.senha())
                 .build();
+
         Usuario salvo = repository.save(usuario);
         return new UsuarioResponseDTO(salvo.getId(), salvo.getNome(), salvo.getEmail());
     }
@@ -61,9 +50,9 @@ public class UsuarioService {
     public UsuarioResponseDTO atualizarUsuario(Long id, UsuarioRequestDTO dto) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new UsuarioException("Usuário com ID " + id + " não encontrado."));
-        if (dto.nome() == null || dto.nome().isBlank()) {
-            throw new UsuarioException("Nome não pode ser vazio.");
-        }
+
+        validations.forEach(v -> v.validar(dto));
+
         usuario.setNome(dto.nome());
         Usuario salvo = repository.save(usuario);
         return new UsuarioResponseDTO(salvo.getId(), salvo.getNome(), salvo.getEmail());
