@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Usuários</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<div class="topbar">
+    <div class="topbar-brand">
+        <i class="bi bi-people-fill" style="margin-right:8px"></i>usuarios.api
+    </div>
+    <div class="topbar-sub">Bootcamp Deloitte &mdash; Spring Boot</div>
+</div>
+
+<div class="main-grid">
+
+
+    <div class="sidebar">
+
+
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tabCriar" onclick="trocarAba('criar')">
+                <i class="bi bi-person-plus"></i> Novo
+            </button>
+            <button class="tab-btn" id="tabEditar" onclick="trocarAba('editar')">
+                <i class="bi bi-pencil"></i> Editar
+            </button>
+        </div>
+
+
+        <div class="alert-custom alert-error d-none" id="alertError">
+            <i class="bi bi-exclamation-circle" style="margin-top:1px;flex-shrink:0"></i>
+            <span id="alertMessage"></span>
+        </div>
+        <div class="alert-custom alert-success d-none" id="alertSuccess">
+            <i class="bi bi-check-circle" style="margin-top:1px;flex-shrink:0"></i>
+            <span id="alertSuccessMessage"></span>
+        </div>
+
+
+        <div id="painelCriar">
+            <div class="sidebar-title">Novo Usuário</div>
+            <form id="formCriar">
+                <div class="mb-form">
+                    <label class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="criarNome" placeholder="Nome completo">
+                </div>
+                <div class="mb-form">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" id="criarEmail" placeholder="exemplo@gmail.com">
+                </div>
+                <div class="mb-form">
+                    <label class="form-label">Senha</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="criarSenha" placeholder="Mínimo 6 caracteres">
+                        <button class="btn-eye" type="button" onclick="toggleSenha('criarSenha','eyeCriar')">
+                            <i class="bi bi-eye" id="eyeCriar"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-form">
+                    <label class="form-label">CPF</label>
+                    <input type="text" class="form-control" id="criarCpf" placeholder="000.000.000-00">
+                </div>
+                <div class="mb-form" style="margin-bottom:20px">
+                    <label class="form-label">Telefone</label>
+                    <input type="text" class="form-control" id="criarTelefone" placeholder="11987654321">
+                </div>
+                <button type="submit" class="btn-primary-custom">
+                    <i class="bi bi-check-lg me-1"></i> Cadastrar
+                </button>
+            </form>
+        </div>
+
+
+        <div id="painelEditar" style="display:none">
+            <div class="sidebar-title">Editar Usuário</div>
+
+            <div class="edit-indicator" id="editIndicator">
+                <i class="bi bi-person-fill me-1"></i>
+                Editando: <span id="editingName"></span>
+            </div>
+
+            <div class="edit-placeholder" id="editPlaceholder">
+                <i class="bi bi-arrow-right-circle"></i>
+                <p>Clique no <strong>lápis</strong> de um usuário na tabela para editar.</p>
+            </div>
+
+            <form id="formEditar" style="display:none">
+                <input type="hidden" id="editId">
+                <div class="mb-form">
+                    <label class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="editNome" placeholder="Nome completo">
+                </div>
+                <div class="mb-form">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" id="editEmail" placeholder="exemplo@gmail.com">
+                </div>
+                <div class="mb-form">
+                    <label class="form-label">Senha</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="editSenha" placeholder="Nova senha">
+                        <button class="btn-eye" type="button" onclick="toggleSenha('editSenha','eyeEditar')">
+                            <i class="bi bi-eye" id="eyeEditar"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-form">
+                    <label class="form-label">CPF</label>
+                    <input type="text" class="form-control" id="editCpf" placeholder="000.000.000-00">
+                </div>
+                <div class="mb-form" style="margin-bottom:20px">
+                    <label class="form-label">Telefone</label>
+                    <input type="text" class="form-control" id="editTelefone" placeholder="11987654321">
+                </div>
+                <button type="submit" class="btn-primary-custom">
+                    <i class="bi bi-check-lg me-1"></i> Atualizar
+                </button>
+                <button type="button" class="btn-cancel-custom" onclick="cancelarEdicao()">
+                    Cancelar
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+
+    <div class="content">
+        <div class="content-header">
+            <span class="content-title">
+                <i class="bi bi-table me-1"></i> Usuários cadastrados
+            </span>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span class="user-count" id="userCount">— registros</span>
+                <button class="refresh-btn" onclick="carregarUsuarios()">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="empty-state d-none" id="emptyState">
+                <i class="bi bi-inbox"></i>
+                <p>nenhum usuário cadastrado.</p>
+            </div>
+            <div id="tableWrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>CPF</th>
+                        <th>Telefone</th>
+                        <th style="text-align:right">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="usuariosTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="modal-icon">
+                    <i class="bi bi-trash3"></i>
+                </div>
+                <div class="modal-title-text">Deletar usuário?</div>
+                <div class="modal-sub" id="deleteUserName"></div>
+                <div style="display:flex;gap:10px;justify-content:center">
+                    <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn-modal-delete" id="confirmDeleteBtn">Deletar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

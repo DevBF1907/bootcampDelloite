@@ -20,4 +20,15 @@ public class NomeDuplicadoValidation implements UsuarioValidation {
             throw new UsuarioException("Já existe um usuário com esse nome.");
         }
     }
+
+    @Override
+    public void validar(UsuarioRequestDTO dto, Long idIgnorar) {
+        if (dto.nome() == null || dto.nome().isBlank()) return;
+
+        repository.findByNomeIgnoreCase(dto.nome()).ifPresent(u -> {
+            if (!u.getId().equals(idIgnorar)) {
+                throw new UsuarioException("Já existe um usuário com esse nome.");
+            }
+        });
+    }
 }

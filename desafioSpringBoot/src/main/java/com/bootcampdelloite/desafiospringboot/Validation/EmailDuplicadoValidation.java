@@ -20,4 +20,15 @@ public class EmailDuplicadoValidation implements UsuarioValidation {
             throw new UsuarioException("Esse email já está cadastrado.");
         }
     }
+
+    @Override
+    public void validar(UsuarioRequestDTO dto, Long idIgnorar) {
+        if (dto.email() == null || dto.email().isBlank()) return;
+
+        repository.findByEmailIgnoreCase(dto.email()).ifPresent(u -> {
+            if (!u.getId().equals(idIgnorar)) {
+                throw new UsuarioException("Esse email já está cadastrado.");
+            }
+        });
+    }
 }

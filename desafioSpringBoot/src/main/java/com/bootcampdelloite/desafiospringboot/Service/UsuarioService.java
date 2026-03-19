@@ -53,11 +53,24 @@ public class UsuarioService {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new UsuarioException("Usuário com ID " + id + " não encontrado."));
 
-        validations.forEach(v -> v.validar(dto));
+        UsuarioRequestDTO dtoParaValidar = new UsuarioRequestDTO(
+                (dto.nome()     != null && !dto.nome().isBlank())     ? dto.nome()     : usuario.getNome(),
+                (dto.email()    != null && !dto.email().isBlank())    ? dto.email()    : usuario.getEmail(),
+                (dto.senha()    != null && !dto.senha().isBlank())    ? dto.senha()    : usuario.getSenha(),
+                (dto.cpf()      != null && !dto.cpf().isBlank())      ? dto.cpf()      : usuario.getCpf(),
+                (dto.telefone() != null && !dto.telefone().isBlank()) ? dto.telefone() : usuario.getTelefone()
+        );
 
-        usuario.setNome(dto.nome());
-        usuario.setCpf(dto.cpf());
-        usuario.setTelefone(dto.telefone());
+        validations.forEach(v -> v.validar(dtoParaValidar, id));
+
+        if (dto.nome()     != null && !dto.nome().isBlank())     usuario.setNome(dto.nome());
+        if (dto.email()    != null && !dto.email().isBlank())    usuario.setEmail(dto.email());
+        if (dto.senha() != null && !dto.senha().isBlank() && dto.senha().equals(usuario.getSenha())) {
+            throw new UsuarioException("A nova senha não pode ser igual à senha atual.");
+        }
+        if (dto.cpf()      != null && !dto.cpf().isBlank())      usuario.setCpf(dto.cpf());
+        if (dto.telefone() != null && !dto.telefone().isBlank()) usuario.setTelefone(dto.telefone());
+
         Usuario salvo = repository.save(usuario);
         return toDTO(salvo);
     }
